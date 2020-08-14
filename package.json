@@ -35,10 +35,10 @@
     "class-transformer": "^0.2.3",
     "class-validator": "^0.12.2",
     "image-downloader": "^4.0.1",
+    "pg": "^8.3.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.4",
-    "sqlite3": "^5.0.0",
     "typeorm": "^0.2.25"
   },
   "devDependencies": {

@@ -6,8 +6,12 @@ export interface AppConfiguration {
 
 export const config: AppConfiguration = {
   database: {
-    type: 'sqlite',
-    database: 'database.sqlite',
+    type: 'postgres',
+    host: 'localhost',
+    port: 5432,
+    username: 'postgres',
+    password: 'MtG@Back',
+    database: 'mtga',
     entities: [`${__dirname}/**/*.entity{.ts,.js}`],
     migrations: [`${__dirname}/migration/*{.ts,.js}`],
     cli: {
