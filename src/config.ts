@@ -7,7 +7,7 @@ export interface AppConfiguration {
 export const config: AppConfiguration = {
   database: {
     type: 'postgres',
-    host: 'localhost',
+    host: process.env.DB_HOST || 'localhost',
     port: 5432,
     username: 'postgres',
     password: 'MtG@Back',
@@ -15,9 +15,10 @@ export const config: AppConfiguration = {
     entities: [`${__dirname}/**/*.entity{.ts,.js}`],
     migrations: [`${__dirname}/migration/*{.ts,.js}`],
     cli: {
-      migrationsDir: 'src/migration',
+      migrationsDir: `${__dirname}/migration`,
     },
-    synchronize: true,
-    logging: true,
+    synchronize: false,
+    migrationsRun: true,
+    logging: false,
   },
 };

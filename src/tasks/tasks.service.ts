@@ -35,7 +35,7 @@ export class TasksService {
     private superTypeService: SuperTypeService,
   ) {}
 
-  @Cron('0 0 15 */2 * *')
+  @Cron('0 0 3 */2 * *')
   async handleCron(): Promise<any> {
     try {
       const sets = await this.loadSets();
@@ -73,7 +73,6 @@ export class TasksService {
           set.set_icon = await this.saveImage(
             rawSet.icon_svg_uri,
             './images/sets',
-            'set/image',
           );
           return set;
         }
@@ -148,7 +147,6 @@ export class TasksService {
               cardImage.image_uri = await this.saveImage(
                 card_face.image_uris.normal,
                 './images/cards',
-                'card_image',
               );
               return await this.cardImageService.createCardImage(cardImage);
             }),
@@ -159,7 +157,6 @@ export class TasksService {
           cardImage.image_uri = await this.saveImage(
             rawCard.image_uris.normal,
             './images/cards',
-            'card_image',
           );
           await this.cardImageService.createCardImage(cardImage);
           cardImages.push(cardImage);
@@ -284,22 +281,11 @@ export class TasksService {
     await this.superTypeService.create(superTypeEntitys);
   }
 
-  private async saveImage(
-    imageUrl: string,
-    path: string,
-    endPoint: string,
-  ): Promise<string> {
+  private async saveImage(imageUrl: string, path: string): Promise<string> {
     const { filename } = await imageDownloader.image({
       url: imageUrl,
       dest: path,
     });
-    const imageName = this.getImageName(filename);
-    return `http://localhost:3000/${endPoint}/${imageName}`;
-  }
-
-  private getImageName(imageCreatedUrl: string): string {
-    const splitedImgUrlLength = imageCreatedUrl.split('\\').length;
-    const imageName = imageCreatedUrl.split('\\')[splitedImgUrlLength - 1];
-    return imageName;
+    return `http://localhost:3000/${filename}`;
   }
 }

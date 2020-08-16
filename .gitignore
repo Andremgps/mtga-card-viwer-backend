@@ -36,5 +36,5 @@ lerna-debug.log*
 # ORM
 ormconfig.json
 
-#SQLITE
-database.sqlite
+#PG DOCKER
+pgdata
