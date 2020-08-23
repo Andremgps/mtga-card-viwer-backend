@@ -35,8 +35,8 @@ export class TasksService {
     private superTypeService: SuperTypeService,
   ) {}
 
-  @Cron('0 15 * * * *')
-  //@Cron('0 0 3 */2 * *')
+  //@Cron('0 15 * * * *')
+  @Cron('0 0 3 */2 * *')
   async handleCron(): Promise<any> {
     try {
       const sets = await this.loadSets();
