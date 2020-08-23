@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { ColorEntity } from 'src/card/color/color.entity';
 
-export class colorsSeed1597280162169 implements MigrationInterface {
+export class colorsSeed1598209487308 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.manager
       .getRepository<ColorEntity>(ColorEntity)

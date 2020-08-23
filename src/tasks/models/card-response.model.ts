@@ -13,7 +13,7 @@ export interface CardResponseModel {
     name: string;
     image_uris: {
       normal: string;
-    }
+    };
   }[];
   image_uris: {
     normal: string;

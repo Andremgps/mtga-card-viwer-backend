@@ -4,6 +4,7 @@ import { CardEntity } from './card.entity';
 import { Repository, createQueryBuilder } from 'typeorm';
 import { FilterCardDto } from './dto/filter-card.dto';
 import { PaginatedCardResultDto } from './dto/paginated-card-result.dto';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class CardService {
@@ -109,7 +110,7 @@ export class CardService {
       .take(filterCardDto.limit)
       .getMany();
     return {
-      data: cards,
+      data: plainToClass(CardEntity, cards),
       page: filterCardDto.page,
       limit: filterCardDto.limit,
       totalCount,

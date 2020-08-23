@@ -35,12 +35,14 @@ export class TasksService {
     private superTypeService: SuperTypeService,
   ) {}
 
-  @Cron('0 0 3 */2 * *')
+  @Cron('0 15 * * * *')
+  //@Cron('0 0 3 */2 * *')
   async handleCron(): Promise<any> {
     try {
       const sets = await this.loadSets();
       const cards = await this.loadCards(sets);
       await this.loadAllMtgaTypes(cards);
+      Logger.log('Integration Done!');
     } catch (error) {
       Logger.error(error);
       setTimeout(() => {
@@ -120,9 +122,11 @@ export class TasksService {
             ? colors.filter(x => x.color === 'N')
             : colors.filter(x => rawCard.color_identity.includes(x.color));
         foundCard.colors = cardColors;
+        foundCard.color_identity = cardColors.map(x => x.color);
         foundCard.cmc = rawCard.cmc;
         foundCard.rarity = rawCard.rarity;
         foundCard.type_line = rawCard.type_line;
+        foundCard.card_sets = rawCard.all_sets.map(x => x.set);
         foundCard.sets = rawCard.all_sets;
         const cardResult = await this.cardService.create(foundCard);
         cards.push(cardResult);
@@ -134,9 +138,11 @@ export class TasksService {
             ? colors.filter(x => x.color === 'N')
             : colors.filter(x => rawCard.color_identity.includes(x.color));
         card.colors = cardColors;
+        card.color_identity = cardColors.map(x => x.color);
         card.cmc = rawCard.cmc;
         card.rarity = rawCard.rarity;
         card.type_line = rawCard.type_line;
+        card.card_sets = rawCard.all_sets.map(x => x.set);
         card.sets = rawCard.all_sets;
         let cardImages: CardImageEntity[] = [];
         if (rawCard.layout === 'transform') {
