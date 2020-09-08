@@ -22,6 +22,8 @@ import { SuperTypeService } from 'src/card/supertype/super-type.service';
 
 import * as imageDownloader from 'image-downloader';
 
+import 'dotenv/config';
+
 @Injectable()
 export class TasksService {
   constructor(
@@ -35,7 +37,7 @@ export class TasksService {
     private superTypeService: SuperTypeService,
   ) {}
 
-  //@Cron('0 15 * * * *')
+  //@Cron('0 23 * * * *')
   @Cron('0 0 3 */2 * *')
   async handleCron(): Promise<any> {
     try {
@@ -115,61 +117,110 @@ export class TasksService {
     const colors = await this.colorService.findAll();
     const cards: CardEntity[] = [];
     for (const rawCard of rawCards) {
-      const foundCard = await this.cardService.findOne(rawCard.name);
-      if (foundCard) {
-        const cardColors =
-          rawCard.color_identity.length === 0
-            ? colors.filter(x => x.color === 'N')
-            : colors.filter(x => rawCard.color_identity.includes(x.color));
-        foundCard.colors = cardColors;
-        foundCard.color_identity = cardColors.map(x => x.color);
-        foundCard.cmc = rawCard.cmc;
-        foundCard.rarity = rawCard.rarity;
-        foundCard.type_line = rawCard.type_line;
-        foundCard.card_sets = rawCard.all_sets.map(x => x.set);
-        foundCard.sets = rawCard.all_sets;
-        const cardResult = await this.cardService.create(foundCard);
-        cards.push(cardResult);
+      let foundCard = false;
+      if (rawCard.layout === 'transform' || rawCard.layout === 'modal_dfc') {
+        for (const cardFace of rawCard.card_faces) {
+          const findedCard = await this.cardService.findByScryfallidAndName(
+            rawCard.id,
+            cardFace.name,
+          );
+          if (findedCard) {
+            foundCard = true;
+            const cardColors =
+              rawCard.color_identity.length === 0
+                ? colors.filter(x => x.color === 'N')
+                : colors.filter(x => rawCard.color_identity.includes(x.color));
+            findedCard.colors = cardColors;
+            findedCard.color_identity = cardColors.map(x => x.color);
+            findedCard.sets = rawCard.all_sets;
+            findedCard.rarity = rawCard.rarity;
+            findedCard.cmc = cardFace.mana_cost ? rawCard.cmc : 0;
+            findedCard.type_line = cardFace.type_line;
+            const cardResult = await this.cardService.create(findedCard);
+            cards.push(cardResult);
+          }
+        }
       } else {
+        const findedCard = await this.cardService.findByScryfallidAndName(
+          rawCard.id,
+          rawCard.name,
+        );
+        if (findedCard) {
+          foundCard = true;
+          const cardColors =
+            rawCard.color_identity.length === 0
+              ? colors.filter(x => x.color === 'N')
+              : colors.filter(x => rawCard.color_identity.includes(x.color));
+          findedCard.colors = cardColors;
+          findedCard.color_identity = cardColors.map(x => x.color);
+          findedCard.cmc = rawCard.cmc;
+          findedCard.rarity = rawCard.rarity;
+          findedCard.type_line = rawCard.type_line;
+          findedCard.sets = rawCard.all_sets;
+          const cardResult = await this.cardService.create(findedCard);
+          cards.push(cardResult);
+        }
+      }
+      if (!foundCard) {
         const card = new CardEntity();
-        card.name = rawCard.name;
         const cardColors =
           rawCard.color_identity.length === 0
             ? colors.filter(x => x.color === 'N')
             : colors.filter(x => rawCard.color_identity.includes(x.color));
         card.colors = cardColors;
         card.color_identity = cardColors.map(x => x.color);
-        card.cmc = rawCard.cmc;
         card.rarity = rawCard.rarity;
-        card.type_line = rawCard.type_line;
-        card.card_sets = rawCard.all_sets.map(x => x.set);
         card.sets = rawCard.all_sets;
-        let cardImages: CardImageEntity[] = [];
-        if (rawCard.layout === 'transform') {
-          cardImages = await Promise.all(
-            rawCard.card_faces.map(async card_face => {
-              const cardImage = new CardImageEntity();
-              cardImage.face_name = card_face.name;
-              cardImage.image_uri = await this.saveImage(
-                card_face.image_uris.normal,
-                './images/cards',
-              );
-              return await this.cardImageService.createCardImage(cardImage);
-            }),
+        card.scryfallid = rawCard.id;
+        if (rawCard.layout === 'transform' || rawCard.layout === 'modal_dfc') {
+          //Front
+          const cardFront = { ...card };
+          cardFront.name = rawCard.card_faces[0].name;
+          cardFront.cmc = rawCard.card_faces[0].mana_cost ? rawCard.cmc : 0;
+          cardFront.type_line = rawCard.card_faces[0].type_line;
+          cardFront.mana_cost = rawCard.card_faces[0].mana_cost;
+          const cardFrontImage = new CardImageEntity();
+          cardFrontImage.face_name = rawCard.card_faces[0].name;
+          cardFrontImage.image_uri = await this.saveImage(
+            rawCard.card_faces[0].image_uris.normal,
+            './images/cards/front',
           );
+          await this.cardImageService.createCardImage(cardFrontImage);
+          cardFront.images = [cardFrontImage];
+          const cardFrontResult = await this.cardService.create(cardFront);
+          cards.push(cardFrontResult);
+          //Back
+          const cardBack = { ...card };
+          cardBack.name = rawCard.card_faces[1].name;
+          cardBack.cmc = rawCard.card_faces[1].mana_cost ? rawCard.cmc : 0;
+          cardBack.type_line = rawCard.card_faces[1].type_line;
+          cardBack.mana_cost = rawCard.card_faces[1].mana_cost;
+          const cardBackImage = new CardImageEntity();
+          cardBackImage.face_name = rawCard.card_faces[1].name;
+          cardBackImage.image_uri = await this.saveImage(
+            rawCard.card_faces[1].image_uris.normal,
+            './images/cards/back',
+          );
+          await this.cardImageService.createCardImage(cardBackImage);
+          cardBack.images = [cardBackImage];
+          const cardBackResult = await this.cardService.create(cardBack);
+          cards.push(cardBackResult);
         } else {
+          card.name = rawCard.name;
+          card.cmc = rawCard.cmc;
+          card.type_line = rawCard.type_line;
+          card.mana_cost = rawCard.mana_cost;
           const cardImage = new CardImageEntity();
           cardImage.face_name = rawCard.name;
           cardImage.image_uri = await this.saveImage(
             rawCard.image_uris.normal,
-            './images/cards',
+            './images/cards/front',
           );
           await this.cardImageService.createCardImage(cardImage);
-          cardImages.push(cardImage);
+          card.images = [cardImage];
+          const cardResult = await this.cardService.create(card);
+          cards.push(cardResult);
         }
-        card.images = cardImages;
-        const cardResult = await this.cardService.create(card);
-        cards.push(cardResult);
       }
     }
     return cards;
@@ -292,6 +343,6 @@ export class TasksService {
       url: imageUrl,
       dest: path,
     });
-    return `http://localhost:3000/${filename}`;
+    return `http://${process.env.HOST_IP}:3000/${filename}`;
   }
 }

@@ -28,9 +28,13 @@ export class CardService {
     return result;
   }
 
-  async findOne(name: string): Promise<CardEntity> {
+  async findByScryfallidAndName(
+    scryfallid: string,
+    name: string,
+  ): Promise<CardEntity> {
     const result = await this.cardRepository.findOne({
       where: {
+        scryfallid,
         name,
       },
     });

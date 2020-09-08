@@ -6,11 +6,15 @@ export interface CardResponseModel {
   set: string;
   color_identity: string[];
   cmc: number;
+  mana_cost: string;
   rarity: string;
   type_line: string;
   layout: string;
+  id: string;
   card_faces: {
     name: string;
+    mana_cost: string;
+    type_line: string;
     image_uris: {
       normal: string;
     };

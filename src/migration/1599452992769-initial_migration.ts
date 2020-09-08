@@ -1,12 +1,12 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class initialMigration1598209458315 implements MigrationInterface {
-    name = 'initialMigration1598209458315'
+export class initialMigration1599452992769 implements MigrationInterface {
+    name = 'initialMigration1599452992769'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "set" ("id" SERIAL NOT NULL, "set" character varying NOT NULL, "set_name" character varying NOT NULL, "set_icon" character varying NOT NULL, CONSTRAINT "PK_3a80144a9f862484a2cae876eed" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "color" ("id" SERIAL NOT NULL, "color" character varying NOT NULL, CONSTRAINT "PK_d15e531d60a550fbf23e1832343" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "card" ("id" SERIAL NOT NULL, "name" character varying NOT NULL, "cmc" integer NOT NULL, "color_identity" text NOT NULL, "card_sets" text NOT NULL, "rarity" character varying NOT NULL, "type_line" character varying NOT NULL, CONSTRAINT "PK_9451069b6f1199730791a7f4ae4" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "card" ("id" SERIAL NOT NULL, "scryfallid" character varying NOT NULL, "name" character varying NOT NULL, "cmc" integer NOT NULL, "mana_cost" character varying NOT NULL, "color_identity" text NOT NULL, "rarity" character varying NOT NULL, "type_line" character varying NOT NULL, CONSTRAINT "PK_9451069b6f1199730791a7f4ae4" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "card_images" ("id" SERIAL NOT NULL, "image_uri" character varying NOT NULL, "face_name" character varying NOT NULL, "cardId" integer, CONSTRAINT "PK_402596c7513fbd3cc45750c8e16" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "sub_type" ("id" SERIAL NOT NULL, "name" character varying NOT NULL, CONSTRAINT "PK_794cc1eaeaa3bda4c067be72fac" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "super_type" ("id" SERIAL NOT NULL, "name" character varying NOT NULL, CONSTRAINT "PK_d9d03da4eaa8360a749d82d54d4" PRIMARY KEY ("id"))`);

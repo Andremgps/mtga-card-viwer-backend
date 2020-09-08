@@ -36,5 +36,8 @@ lerna-debug.log*
 # ORM
 ormconfig.json
 
-#PG DOCKER
+# PG DOCKER
 pgdata
+
+# ENVIROMENT
+.env

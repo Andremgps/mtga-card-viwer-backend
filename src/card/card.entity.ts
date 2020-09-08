@@ -17,16 +17,19 @@ export class CardEntity {
   id: number;
 
   @Column()
+  scryfallid: string;
+
+  @Column()
   name: string;
 
   @Column()
   cmc: number;
 
-  @Column('simple-array')
-  color_identity: string[];
+  @Column()
+  mana_cost: string;
 
   @Column('simple-array')
-  card_sets: string[];
+  color_identity: string[];
 
   @Column()
   rarity: string;
@@ -42,7 +45,6 @@ export class CardEntity {
 
   @ManyToMany(type => SetEntity)
   @JoinTable()
-  @Exclude()
   sets: SetEntity[];
 
   //Coluna criada para fazer o join e filtrar por cores
