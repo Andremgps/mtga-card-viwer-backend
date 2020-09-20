@@ -1,0 +1,46 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - webnet
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+  web:
+    image: andremgps/mtga-card-viewer-server:latest
+    volumes:
+      - images:/app/images
+    networks:
+      - webnet
+    environment:
+      DB_HOST: db
+      HOST_IP: ${HOST_IP}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - db
+    command: ['./wait-for-it.sh', 'db:5432', '--', 'node', 'main.js']
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx-backend.template:/etc/nginx/conf.d/nginx-backend.template
+    ports:
+      - '3000:80'
+    networks:
+      - webnet
+    depends_on:
+      - web
+    command: /bin/bash -c "cat /etc/nginx/conf.d/nginx-backend.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+networks:
+  webnet:
+volumes:
+  pgdata:
+    external: true
+  images:
+    external: true

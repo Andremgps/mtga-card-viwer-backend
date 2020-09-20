@@ -7,6 +7,8 @@ export class FilterCardDto {
   cmc: number;
   cmcCondition: string;
   rarity: string;
-  type_line: string;
+  type: string;
+  subType: string;
+  superType: string;
   sets: string;
 }

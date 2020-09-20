@@ -73,10 +73,24 @@ export class CardService {
         rarity: filterCardDto.rarity,
       });
     }
-    if (filterCardDto.type_line) {
-      queryBuilder.andWhere('type_line like :type_line', {
-        type_line: `%${filterCardDto.type_line}%`,
+    if (filterCardDto.type) {
+      queryBuilder.andWhere('type_line like :type', {
+        type: `%${filterCardDto.type}%`,
       });
+    }
+    if (filterCardDto.subType) {
+      queryBuilder.andWhere('type_line like :subType', {
+        subType: `%${filterCardDto.subType}%`,
+      });
+    }
+    if (filterCardDto.superType) {
+      if (filterCardDto.superType == 'Legendary') {
+        queryBuilder.andWhere('type_line like :superType', {
+          superType: `%${filterCardDto.superType}%`,
+        });
+      } else if (filterCardDto.superType == 'Basic') {
+        queryBuilder.andWhere(`type_line not like '%Legendary%'`);
+      }
     }
     if (filterCardDto.colors) {
       const colors = filterCardDto.colors.split(',');
@@ -90,11 +104,11 @@ export class CardService {
           'card.id in ' +
             queryBuilder
               .subQuery()
-              .select('cardId')
+              .select('"cardId"')
               .from('card_colors_color', 'card_colors')
-              .where('colorId in (:...colors)', { colors: colors })
-              .groupBy('cardId')
-              .having('COUNT(DISTINCT colorId) = :colorLength', {
+              .where('"colorId" in (:...colors)', { colors: colors })
+              .groupBy('"cardId"')
+              .having('COUNT(DISTINCT "colorId") = :colorLength', {
                 colorLength: colors.length,
               })
               .getQuery(),

@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { SuperTypeService } from './super-type.service';
 import { SuperTypeEntity } from './super-type.entity';
 
@@ -6,6 +6,7 @@ import { SuperTypeEntity } from './super-type.entity';
 export class SuperTypeController {
   constructor(private readonly superTypeService: SuperTypeService) {}
 
+  @Get()
   async findAll(): Promise<SuperTypeEntity[]> {
     return await this.superTypeService.findAll();
   }
